@@ -1,0 +1,55 @@
+/* Estilos personalizados */
+body {
+    background:radial-gradient(at 96.49283077073736% 42.87202481763821%, hsla(211.03448275862067, 56.862745098039284%, 90%, 1) 0%, hsla(211.03448275862067, 56.862745098039284%, 90%, 0) 100%), radial-gradient(at 21.072147853117418% 8.332825325753301%, hsla(251.99999999999994, 38.46153846153849%, 94.90196078431372%, 1) 0%, hsla(251.99999999999994, 38.46153846153849%, 94.90196078431372%, 0) 100%), radial-gradient(at 78.47940016751653% 87.55551599150111%, hsla(211.03448275862067, 56.862745098039284%, 90%, 1) 0%, hsla(211.03448275862067, 56.862745098039284%, 90%, 0) 100%), radial-gradient(at 66.39976667942473% 94.72660681024504%, hsla(251.99999999999994, 38.46153846153849%, 94.90196078431372%, 1) 0%, hsla(251.99999999999994, 38.46153846153849%, 94.90196078431372%, 0) 100%);
+}
+
+.navbar-dark {
+    background: -webkit-linear-gradient(207deg, #858a86,#a6aab9,#ededed);background: linear-gradient(207deg, #858a86,#a6aab9,#ededed);
+}
+
+.navbar-nav .nav-link {
+    transition: color 0.3s ease-in-out;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #ffc107 !important;
+}
+
+.logo{
+    width: 6rem ;
+    height: 6rem ;
+    object-fit: contain;
+}
+
+/* Animación para el carrito */
+@keyframes cartBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.nav-item:hover .bi-cart {
+    animation: cartBounce 0.5s ease-in-out;
+}
+
+.card {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.carousel-item img {
+    object-fit: cover;
+    height: 400px;
+}
+
+.btn {
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+footer{
+    background: -webkit-linear-gradient(143deg, #222120,#312e26,#45423a);background: linear-gradient(143deg, #222120,#312e26,#45423a);
+}
