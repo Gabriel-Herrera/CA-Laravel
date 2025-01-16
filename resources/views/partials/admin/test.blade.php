@@ -2,9 +2,8 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container none">
 
-            <a class="navbar-brand" href="{{ route('home') }}">
-                <img class="logo d-inline-block align-text-center" src="{{ asset('storage/ca-icon.png') }}"
-                    alt="Compra ágil logo" width="60" height="60">
+            <a class="navbar-brand" href="{{ route('admin.dashboard') }}">
+                <img class="logo" src="{{ asset('storage/compra-agil.jpeg') }}" alt="laf logo";>
                 Compra Ágil
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -15,35 +14,40 @@
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('home') }}">
-                            <i class="bi bi-house"></i>
-                            Inicio
+                            <i class="bi bi-shop"></i>
+                            Tienda
                         </a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-bookmark"></i>
-                            Categorías
+                            Dashboard
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            @foreach ($categories as $category)
-                                <li>
-                                    <a class="dropdown-item {{ request('category') == $category->id ? 'active' : '' }}"
-                                        href="{{ route('products.index', ['category' => $category->id]) }}">
-                                        {{ $category->nombre }}
-                                    </a>
-                                </li>
-                            @endforeach
+                            <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">Inicio</a>
+                            </li>
+                            <li><a class="dropdown-item" href="{{ route('admin.products.index') }}">Productos</a>
+                            </li>
+                            <li><a class="dropdown-item" href="{{ route('admin.categories.index') }}">Categorías</a>
+                            </li>
+
+
                         </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="btn btn-primary btn-sm nav-link">
+                            <i class="fas fa-shopping-cart fa-sm"></i> Gestionar Pedidos
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('admin.discounts.index') }}" class="btn btn-primary btn-sm nav-link">
+                            <i class="fas fa-percent fa-sm"></i> Gestionar Descuentos
+                        </a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('cart.index') }}">
-                            <i class="bi bi-cart"></i> Carrito
-                            <span class="badge bg-primary" id="cartItemCount">0</span>
-                        </a>
-                    </li>
+
                     @guest
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('login') }}">Iniciar Sesión</a>
@@ -60,10 +64,7 @@
                             </a>
 
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                @if (Auth::check() && Auth::user()->isAdmin())
-                                    <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">Panel de
-                                            Admin</a></li>
-                                @endif
+
                                 <li><a class="dropdown-item" href="">Mi Perfil</a></li>
                                 <li>
                                     <hr class="dropdown-divider">

@@ -122,7 +122,7 @@
                                     <h6 class="mb-1">{{ $product->nombre }}</h6>
                                     <small class="text-danger">Stock: {{ $product->stock }}</small>
                                 </div>
-                                <p class="mb-1">Categoría: {{ $product->categoria }}</p>
+                                <p class="mb-1">Categoría: {{ $product->category->nombre }}</p>
                             </div>
                         @empty
                             <div class="text-center py-3">

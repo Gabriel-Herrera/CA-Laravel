@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     protected $table = 'productos';
+
+    protected $casts = [
+        'etiquetas' => 'array',
+    ];
     protected $fillable = [
         'nombre',
         'descripcion',
@@ -14,8 +18,16 @@ class Product extends Model
         'stock',
         'categoria_id',
         'imagen',
-        'descuento'
+        'descuento',
+        'etiquetas',
     ];
+
+
+
+    public function setEtiquetasAttribute($value)
+    {
+        $this->attributes['etiquetas'] = json_encode($value);
+    }
 
     public function category()
     {

@@ -1,216 +1,115 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container py-4">
-    <h1 class="mb-4">Carrito de Compras</h1>
-
-    @if(session('cart'))
-        <div class="card">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Cantidad</th>
-                                <th>Precio Unitario</th>
-                                <th>Descuento</th>
-                                <th>Subtotal</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php $total = 0 @endphp
-                            @foreach(session('cart') as $id => $details)
-                                @php
-                                    $product = \App\Models\Product::find($id);
-                                    $precio = $product->precio * (1 - ($product->descuento / 100));
-                                    $subtotal = $precio * $details['quantity'];
-                                    $total += $subtotal;
-                                @endphp
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <img src="{{ asset('storage/'.$product->imagen) }}"
-                                                 alt="{{ $product->nombre }}"
-                                                 class="img-thumbnail me-2"
-                                                 style="width: 50px">
-                                            {{ $product->nombre }}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <input type="number"
-                                               value="{{ $details['quantity'] }}"
-                                               class="form-control quantity update-cart"
-                                               data-id="{{ $id }}"
-                                               min="1"
-                                               max="{{ $product->stock }}"
-                                               style="width: 70px">
-                                    </td>
-                                    <td>{{ number_format($product->precio, 0, ',', '.') }} CLP</td>
-                                    <td>
-                                        @if($product->descuento > 0)
-                                            <span class="badge bg-success">{{ $product->descuento }}%</span>
-                                        @else
-                                            -
-                                        @endif
-                                    </td>
-                                    <td>{{ number_format($subtotal, 0, ',', '.') }} CLP</td>
-                                    <td>
-                                        <button class="btn btn-danger btn-sm remove-from-cart"
-                                                data-id="{{ $id }}">
-                                            <i class="bi bi-trash"></i>
-                                            Eliminar
-                                        </button>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+    <div class="container">
+        <div class="row">
+            <!-- Existing code for cart items -->
+            <div class="col-md-12">
+                <h2>Carrito de compras</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Existing code for cart items -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h3>Resumen del pedido</h3>
+                <p>Subtotal: <span id="subtotal">0</span> CLP</p>
+                <p>IVA (19%): <span id="iva">0</span> CLP</p>
+                <p>Total: <span id="total">0</span> CLP</p>
+            </div>
+            <div class="col-md-6">
+                <div class="col-md-6">
+                    <form action="{{ route('cart.apply-discount') }}" method="POST" class="mb-3">
+                        @csrf
+                        <div class="input-group">
+                            <input type="text" name="discount_code" class="form-control"
+                                placeholder="Código de descuento">
+                            <button type="submit" class="btn btn-outline-secondary">Aplicar</button>
+                        </div>
+                    </form>
                 </div>
 
-                <div class="card-footer">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p class="mb-0">
-                                <strong>Subtotal:</strong>
-                                {{ number_format($total, 0, ',', '.') }} CLP
-                            </p>
-                            @php
-                                $shipping = $total >= 20000 ? 0 : 3000;
-                                $total += $shipping;
-                            @endphp
-                            <p class="mb-0">
-                                <strong>Envío:</strong>
-                                @if($shipping === 0)
-                                    <span class="text-success">¡Envío gratis!</span>
-                                @else
-                                    {{ number_format($shipping, 0, ',', '.') }} CLP
-                                @endif
-                            </p>
-                            <p class="h4 mt-2">
-                                <strong>Total:</strong>
-                                <span data-cart-total>{{ number_format($total, 0, ',', '.') }} CLP</span>
-                            </p>
-                        </div>
-                        <div class="col-md-6 text-end">
-                            <a href="{{ route('checkout') }}" class="btn btn-primary">
-                                Proceder al pago
-                            </a>
-                        </div>
+                @if (isset($appliedDiscount))
+                    <div class="alert alert-success">
+                        Descuento aplicado: {{ $appliedDiscount['code'] }}
+                        <br>
+                        Ahorro: {{ number_format($appliedDiscount['saved_amount'], 0, ',', '.') }} CLP
                     </div>
-                </div>
+                @endif
+                <button type="button" class="btn btn-primary btn-lg btn-block" onclick="proceedToPayment()">Proceder al
+                    pago</button>
             </div>
         </div>
-    @else
-        <div class="alert alert-info">
-            Tu carrito está vacío. <a href="{{ route('home') }}">Continuar comprando</a>
-        </div>
-    @endif
-</div>
+    </div>
 @endsection
 
-
 @push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Función para actualizar el contador del carrito en el header
-    function updateCartCounter(count) {
-        const counter = document.getElementById('cartItemCount');
-        if (counter) {
-            counter.textContent = count;
-        }
-    }
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Actualizar cantidad
+            document.querySelectorAll('.update-cart').forEach(function(element) {
+                element.addEventListener('change', function() {
+                    let id = this.getAttribute('data-id');
+                    let quantity = this.value;
 
-    // Actualizar cantidad
-    document.querySelectorAll('.update-cart').forEach(function(element) {
-        element.addEventListener('change', function() {
-            const id = this.getAttribute('data-id');
-            const quantity = parseInt(this.value);
-            const row = this.closest('tr');
+                    fetch(`/cart/update/${id}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector(
+                                    'meta[name="csrf-token"]').getAttribute('content'),
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                quantity: quantity
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                location.reload();
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                });
+            });
 
-            if (quantity < 1) {
-                this.value = 1;
-                return;
-            }
+            // Eliminar del carrito
+            document.querySelectorAll('.remove-from-cart').forEach(function(element) {
+                element.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    let id = this.getAttribute('data-id');
 
-            fetch(`/cart/update/${id}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    quantity: quantity
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    // Actualizar subtotal del item
-                    const subtotalCell = row.querySelector('td:nth-last-child(2)');
-                    if (subtotalCell) {
-                        subtotalCell.textContent = data.item_total + ' CLP';
-                    }
-
-                    // Actualizar totales
-                    document.querySelector('[data-cart-total]').textContent = data.cart_total + ' CLP';
-                    updateCartCounter(data.cart_count);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error al actualizar el carrito');
+                    fetch(`/cart/remove/${id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector(
+                                    'meta[name="csrf-token"]').getAttribute('content'),
+                                'Accept': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                location.reload();
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                });
             });
         });
-    });
-
-    // Eliminar del carrito
-    document.querySelectorAll('.remove-from-cart').forEach(function(element) {
-        element.addEventListener('click', function(e) {
-            e.preventDefault();
-            const id = this.getAttribute('data-id');
-            const row = this.closest('tr');
-
-            if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-                fetch(`/cart/remove/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        row.remove();
-                        document.querySelector('[data-cart-total]').textContent = data.cart_total + ' CLP';
-                        updateCartCounter(data.cart_count);
-
-                        // Si no quedan items, recargar la página para mostrar el mensaje de carrito vacío
-                        if (data.cart_count === 0) {
-                            location.reload();
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error al eliminar el producto del carrito');
-                });
-            }
-        });
-    });
-});
-</script>
+    </script>
 @endpush

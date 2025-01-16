@@ -20,9 +20,7 @@ class AdminController extends Controller
     }
 
     public function index()
-    {   
-        \Log::info('AdminController index method called', ['user' => auth()->user()]);
-        // Aseguramos que todas las variables estén definidas usando el modelo Category
+    {           // Aseguramos que todas las variables estén definidas usando el modelo Category
         $totalCategories = Category::count(); // Asegúrate de que el modelo Category esté importado
         $totalOrders = Order::count();
         $latestProducts = Product::latest()->take(5)->get();
@@ -36,7 +34,7 @@ class AdminController extends Controller
         } catch (\Exception $e) {
             $totalCategories = 0; // Valor por defecto si hay algún error
         }
-        
+
         return view('admin.dashboard', compact('totalProducts', 'lowStockProducts', 'allProducts','totalCategories',
             'totalOrders',
             'latestProducts'));

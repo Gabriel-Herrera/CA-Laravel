@@ -5,10 +5,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DiscountController;
 
 
 // Rutas públicas
@@ -31,13 +31,29 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/products/search', [ProductController::class, 'search'])->name('admin.products.search');
 });
 
-// Rutas del carrito
+Route::group(['prefix' => 'admin'], function () {
+    Route::get('/discounts', [DiscountController::class, 'index'])->name('admin.discounts.index');
+    Route::get('/discounts/create', [DiscountController::class, 'create'])->name('admin.discounts.create');
+    Route::post('/discounts', [DiscountController::class, 'store'])->name('admin.discounts.store');
+    Route::get('/discounts/{discount}/edit', [DiscountController::class, 'edit'])->name('admin.discounts.edit');
+    Route::put('/discounts/{discount}', [DiscountController::class, 'update'])->name('admin.discounts.update');
+    Route::delete('/discounts/{discount}', [DiscountController::class, 'destroy'])->name('admin.discounts.destroy');
+});
+
 // Rutas del carrito
 Route::group(['middleware' => ['web']], function () {
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
     Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
     Route::post('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update');
+});
+
+Route::group(['prefix' => 'cart'], function () {
+    // Existing routes...
+
+    Route::post('/apply-discount', [CartController::class, 'applyDiscount'])->name('cart.apply-discount');
+
+    // Rest of the routes...
 });
 
 Route::middleware('guest')->group(function () {

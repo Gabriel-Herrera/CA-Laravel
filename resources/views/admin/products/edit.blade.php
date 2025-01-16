@@ -57,6 +57,33 @@
                                 @enderror
                             </div>
 
+                            <!-- Agregar después del campo de precio -->
+                            <div class="mb-3">
+                                <label for="descuento" class="form-label">Descuento (%)</label>
+                                <input type="number" class="form-control @error('descuento') is-invalid @enderror"
+                                    id="descuento" name="descuento" value="{{ old('descuento', $product->descuento) }}"
+                                    min="0" max="100">
+                                @error('descuento')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="etiquetas" class="form-label">Etiquetas</label>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="etiqueta_oferta" name="etiquetas[]"
+                                        value="oferta"
+                                        {{ in_array('oferta', $product->etiquetas ?? []) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="etiqueta_oferta">Oferta</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="etiqueta_liquidacion"
+                                        name="etiquetas[]" value="liquidacion"
+                                        {{ in_array('liquidacion', $product->etiquetas ?? []) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="etiqueta_liquidacion">Liquidación</label>
+                                </div>
+                            </div>
+
                             <div class="mb-3">
                                 <label for="imagen" class="form-label">Imagen del Producto</label>
                                 <input type="file" class="form-control-file" id="imagen" name="imagen">
@@ -73,16 +100,16 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="categoria" class="form-label">Categoría</label>
-                                <select class="form-control" id="categoria" name="categoria" required>
-                                    <option value="#"> Seleccionar Categoría</option>
+                                <label for="categoria_id" class="form-label">Categoría</label>
+                                <select class="form-control @error('categoria_id') is-invalid @enderror" id="categoria_id" name="categoria_id" required>
+                                    <option value="">Seleccionar Categoría</option>
                                     @foreach ($categories as $category)
-                                        <option value="{{ $category->nombre }}"
-                                            {{ $product->categoria == $category->nombre ? 'selected' : '' }}>
-                                            {{ $category->nombre }}</option>
+                                        <option value="{{ $category->id }}" {{ old('categoria_id', $product->categoria_id) == $category->id ? 'selected' : '' }}>
+                                            {{ $category->nombre }}
+                                        </option>
                                     @endforeach
                                 </select>
-                                @error('categoria')
+                                @error('categoria_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

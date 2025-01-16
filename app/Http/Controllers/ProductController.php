@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;    
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
@@ -67,7 +68,9 @@ public function show($id)
             'precio' => 'required|numeric|min:0',
             'categoria_id' => 'required|exists:categorias,id',
             'stock' => 'required|integer|min:0',
-            'imagen' => 'image|mimes:jpeg,png,jpg,gif,web|max:2048'
+            'imagen' => 'required|image|mimes:jpeg,png,jpg,gif,web|max:2048',
+            'descuento' => 'nullable|numeric|min:0|max:100',
+            'etiquetas' => 'nullable|array'
         ]);
 
         if ($request->hasFile('imagen')) {
@@ -75,7 +78,7 @@ public function show($id)
             $validatedData['imagen'] = $imagePath;
         }
 
-        Product::create($validatedData);
+        $product = Product::create($validatedData);
 
         return redirect()->route('admin.products.index')->with('success', 'Producto creado exitosamente.');
     }
@@ -92,9 +95,11 @@ public function show($id)
             'nombre' => 'required|max:100',
             'descripcion' => 'required',
             'precio' => 'required|numeric|min:0',
-            'categoria' => 'required|exists:categorias,nombre',
+            'categoria_id' => 'required|exists:categorias,id',
             'stock' => 'required|integer|min:0',
-            'imagen' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'descuento' => 'nullable|numeric|min:0|max:100',
+            'etiquetas' => 'nullable|array'
         ]);
 
         if ($request->hasFile('imagen')) {
